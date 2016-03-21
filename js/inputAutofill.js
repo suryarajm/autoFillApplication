@@ -37,39 +37,15 @@ $(document).ready(function(){
 	        }
 
 		}
+		else{
+			checkPreviousvalue();
+		}
 		 $(".namesOptionList").click(function(){	
 			var selectedOption = $(this).text();
 			$("#inputNames").val(selectedOption);
 			$(".namesOptionList").remove();
 			saveToStack(selectedOption);
 	     });    
-	}
-
-/*
-*list previuous selected values
-*/
-	function checkPreviousvalue(){
-		var listElement = "";
-		var previousSelection = "";
-		var listHolderElement = document.getElementById("listHolderDiv");
-		if(previousSelectedValues.length > 0){
-		  for(i = previousSelectedValues.length; i > 0; i--){		  	 
-			  	previousSelection = previousSelectedValues[i-1];
-			  	if($("#inputNames").val() != previousSelection){
-			  		listElement = document.createElement("li");
-			        listHolderElement.appendChild(listElement);
-			        listElement.setAttribute("class", "namesOptionList");
-			        listElement.appendChild(document.createTextNode(previousSelection));
-			  	}				
-		  }			
-		}  
-
-		$(".namesOptionList").click(function(){	
-			var selectedOption = $(this).text();
-			$("#inputNames").val(selectedOption);
-			$(".namesOptionList").remove();
-			saveToStack(selectedOption);
-	    });    
 	}
 
 /*
@@ -90,16 +66,15 @@ $(document).ready(function(){
 	}
 
 /*
-*clear input field
-*/
-	function clearFields(){
-	 	$("#inputNames").val("");
-	}
-
-/*
 *save selected options into a stack
 */
-	function saveToStack(selectedOption){
+	function saveToStack(selectedOption){		
+        var index = previousSelectedValues.indexOf(selectedOption);
+        if (index > -1) {
+		    previousSelectedValues.splice(index, 1);
+		    selectionCount = selectionCount - 1;
+		}
+
 		if(selectionCount < 4){
 			previousSelectedValues[selectionCount] = selectedOption;
 			selectionCount ++;
@@ -112,6 +87,57 @@ $(document).ready(function(){
 		}
 		
 	}
+
+/*
+*list previuous selected values
+*/
+	function checkPreviousvalue(){
+		var listElement = "";
+		var previousSelection = "";
+		var listHolderElement = document.getElementById("listHolderDiv");
+		if(previousSelectedValues.length > 0){
+		  for(i = previousSelectedValues.length; i > 0; i--){		  	 
+			  	previousSelection = previousSelectedValues[i-1];
+			  	
+			  	if($("#inputNames").val() != previousSelection){
+                    var listItems = $("#listHolderDiv li");
+					listItems.each(function(idx, li) {
+					    if($(listItems[idx]).text() == previousSelection){
+							   $(listItems[idx]).remove()
+	                    }                       
+						    
+					});	
+
+			  		listElement = document.createElement("li");
+			        listHolderElement.appendChild(listElement);
+			        listElement.setAttribute("class", "namesOptionList");
+			        listElement.appendChild(document.createTextNode(previousSelection));
+						
+			  	}
+		  }			
+		}  
+
+		$(".namesOptionList").click(function(){	
+			var selectedOption = $(this).text();
+			$("#inputNames").val(selectedOption);
+			$(".namesOptionList").remove();
+			saveToStack(selectedOption);
+	    });    
+	}
+
+
+
+/*
+*clear input field
+*/
+	function clearFields(){
+	 	$("#inputNames").val("");
+	 	if($(".namesOptionList").length){
+			$(".namesOptionList").remove();
+		}
+	}
+
+
 
 
  
